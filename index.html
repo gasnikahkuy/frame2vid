@@ -18,13 +18,13 @@
         }
         #slideshow-container {
             width: 100%;
-            height: 80vh; /* Make the height 80% of the viewport height */
+            height: 80vh;
             margin: 0 auto;
             position: relative;
             background-color: #000;
             display: flex;
-            justify-content: center; /* Center the image horizontally */
-            align-items: center; /* Center the image vertically */
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
         }
         img {
@@ -56,6 +56,7 @@
         <img id="slideshow-image" src="" alt="Slideshow Image">
     </div>
 
+    <!-- Load ffmpeg.js -->
     <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@5.1.0/dist/ffmpeg.min.js"></script>
     <script>
         const imageInput = document.getElementById('imageInput');
@@ -64,6 +65,7 @@
         let currentIndex = 0;
         let slideshowInterval;
         let videoFrames = [];
+        let ffmpeg;
 
         imageInput.addEventListener('change', handleFileSelect);
 
@@ -86,6 +88,13 @@
             // Wait for all images to be loaded
             if (files.length > 0) {
                 setTimeout(startSlideshow, 200); // Delay for files to load
+            }
+        }
+
+        async function loadFFmpeg() {
+            if (!ffmpeg) {
+                ffmpeg = FFmpeg.createFFmpeg({ log: true });
+                await ffmpeg.load();
             }
         }
 
@@ -121,8 +130,7 @@
         async function exportVideo() {
             if (videoFrames.length === 0) return;
 
-            const ffmpeg = FFmpeg.createFFmpeg({ log: true });
-            await ffmpeg.load();
+            await loadFFmpeg();  // Load ffmpeg.js asynchronously
 
             // Create video from frames
             for (let i = 0; i < videoFrames.length; i++) {
